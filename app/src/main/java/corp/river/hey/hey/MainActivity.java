@@ -27,6 +27,7 @@ import java.net.URLEncoder;
 public class MainActivity extends FragmentActivity {
 
     private static String imsi;
+    private static HeatMap fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class MainActivity extends FragmentActivity {
     private void addMapFragment() {
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        HeatMap fragment = new HeatMap();
+        fragment = new HeatMap();
         transaction.add(R.id.mapView, fragment);
         transaction.commit();
     }
@@ -126,6 +127,7 @@ public class MainActivity extends FragmentActivity {
     public void leulerte(View view) {
         /* Hey! I should send a leulerte */
         getLocation();
+        fragment.addHeatMap();
         new MyAsyncTask().execute("leuleu");
 
     }
@@ -133,6 +135,8 @@ public class MainActivity extends FragmentActivity {
     public void gtfo(View view) {
         /* It is sausage festival! */
         getLocation();
+        fragment.addHeatMap();
         new MyAsyncTask().execute("gtfo");
     }
+
 }

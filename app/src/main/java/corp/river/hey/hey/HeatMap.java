@@ -14,6 +14,18 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 /**
  * A fragment that launches other parts of the demo application.
@@ -66,6 +78,42 @@ public class HeatMap extends Fragment {
 
         // Perform any camera updates here
         return v;
+    }
+
+
+    public void addHeatMap() {
+        HeatmapTileProvider mProvider;
+        List<LatLng> list = null;
+        GoogleMap googleMap = mMapView.getMap();
+        TileOverlay mOverlay;
+
+        try {
+            list = readItems(R.raw.leuleu_loc);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        mProvider = new HeatmapTileProvider.Builder()
+                .data(list)
+                .build();
+
+        mOverlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+    }
+
+    private ArrayList<LatLng> readItems(int resource) throws JSONException {
+        ArrayList<LatLng> list = new ArrayList<LatLng>();
+        InputStream inputStream = getResources().openRawResource(resource);
+        String json = new Scanner(inputStream).useDelimiter("\\A").next();
+        JSONArray array = new JSONArray(json);
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject object = array.getJSONObject(i);
+            double lat = object.getDouble("lat");
+            double lng = object.getDouble("lng");
+            LatLng latLng = new LatLng(lat, lng);
+            list.add(latLng);
+
+        }
+        return list;
     }
 
     @Override
