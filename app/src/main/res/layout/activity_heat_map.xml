@@ -10,4 +10,27 @@
         android:layout_height="500dp"
         class="com.google.android.gms.maps.SupportMapFragment" />
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/hey"
+            android:id="@+id/hey"
+            android:layout_weight="0.50"
+            android:onClick="leulerte" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/aww"
+            android:id="@+id/aww"
+            android:layout_weight="0.50"
+            android:onClick="gtfo" />
+    </LinearLayout>
+
 </LinearLayout>

@@ -44,6 +44,11 @@ public class HeatMap extends Fragment {
         double latitude = 48.889260;
         double longitude = 2.239001;
 
+        if (MyLocationListener.latitude > 0) {
+            latitude = MyLocationListener.latitude;
+            longitude = MyLocationListener.longitude;
+        }
+
         // create marker
         MarkerOptions marker = new MarkerOptions().position(
                 new LatLng(latitude, longitude)).title("Hello Maps");
