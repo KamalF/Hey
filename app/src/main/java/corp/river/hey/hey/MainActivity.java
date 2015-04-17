@@ -76,8 +76,7 @@ public class MainActivity extends FragmentActivity {
     private void sendMsg(String eventType) {
         StringBuilder sb = new StringBuilder();
 
-        String http = "http://requestb.in/17xrlmt1";
-        //String http = "http://hey.river.corp:6969";
+        String http = "http://192.168.255.33/receive/";
         HttpURLConnection urlConnection=null;
         try {
             DataOutputStream printout;
@@ -113,7 +112,7 @@ public class MainActivity extends FragmentActivity {
                 }
                 br.close();
                 System.out.println(""+sb.toString());
-            }else{
+            }else {
                 System.out.println(urlConnection.getResponseMessage());
             }
         } catch (IOException | JSONException e) {
@@ -127,16 +126,17 @@ public class MainActivity extends FragmentActivity {
     public void leulerte(View view) {
         /* Hey! I should send a leulerte */
         getLocation();
+        new MyAsyncTask().execute("HEY");
         fragment.addHeatMap();
-        new MyAsyncTask().execute("leuleu");
 
     }
 
     public void gtfo(View view) {
         /* It is sausage festival! */
         getLocation();
-        fragment.addHeatMap();
-        new MyAsyncTask().execute("gtfo");
+        new MyAsyncTask().execute("AWW");
+        //fragment.addHeatMap();
     }
 
 }
+

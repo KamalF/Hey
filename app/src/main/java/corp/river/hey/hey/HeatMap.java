@@ -1,5 +1,6 @@
 package corp.river.hey.hey;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -22,10 +23,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 /**
  * A fragment that launches other parts of the demo application.
@@ -33,6 +38,7 @@ import java.util.Scanner;
 public class HeatMap extends Fragment {
 
     MapView mMapView;
+    static ArrayList<LatLng> list;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,6 +59,7 @@ public class HeatMap extends Fragment {
 
         GoogleMap googleMap = mMapView.getMap();
         // latitude and longitude
+        // default is Intersec
         double latitude = 48.889260;
         double longitude = 2.239001;
 
@@ -76,44 +83,67 @@ public class HeatMap extends Fragment {
         googleMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(cameraPosition));
 
-        // Perform any camera updates here
+        googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         return v;
     }
 
+    private class AsyncRead extends AsyncTask<String, Integer, Double> {
+        @Override
+        protected Double doInBackground(String... params) {
+            try {
+                readItems("http://192.168.255.33/get/");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
 
     public void addHeatMap() {
         HeatmapTileProvider mProvider;
-        List<LatLng> list = null;
         GoogleMap googleMap = mMapView.getMap();
         TileOverlay mOverlay;
 
-        try {
-            list = readItems(R.raw.leuleu_loc);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        new AsyncRead().execute();
+
+        if (list != null && !list.isEmpty()) {
+            mProvider = new HeatmapTileProvider.Builder()
+                    .data(list) // weightedData
+                    .build();
+
+            mOverlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+            System.out.println(list.size());
         }
-
-        mProvider = new HeatmapTileProvider.Builder()
-                .data(list)
-                .build();
-
-        mOverlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 
-    private ArrayList<LatLng> readItems(int resource) throws JSONException {
-        ArrayList<LatLng> list = new ArrayList<LatLng>();
-        InputStream inputStream = getResources().openRawResource(resource);
-        String json = new Scanner(inputStream).useDelimiter("\\A").next();
+    private static String readAll(Reader rd) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int cp;
+        while ((cp = rd.read()) != -1) {
+            sb.append((char) cp);
+        }
+        return sb.toString();
+    }
+
+    private void readItems(String url) throws IOException, JSONException {
+        list = new ArrayList<LatLng>();
+        InputStream is = new URL(url).openStream();
+        String json;
+        try {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            json = readAll(rd);
+        } finally {
+            is.close();
+        }
         JSONArray array = new JSONArray(json);
         for (int i = 0; i < array.length(); i++) {
             JSONObject object = array.getJSONObject(i);
-            double lat = object.getDouble("lat");
-            double lng = object.getDouble("lng");
+            double lat = object.getDouble("longitude");
+            double lng = object.getDouble("latitude");
             LatLng latLng = new LatLng(lat, lng);
             list.add(latLng);
-
         }
-        return list;
     }
 
     @Override
